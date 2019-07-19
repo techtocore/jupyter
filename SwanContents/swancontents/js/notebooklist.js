@@ -233,6 +233,41 @@ define([
                 clone_button.show();
             }
         }
+
+        /*
+
+         Show Configure button
+
+        */
+
+
+        if (list.type === 'project') {
+            show_package_manager_button(list.path);
+        } else if (list.type === 'directory' && list.project) {
+            show_package_manager_button(list.project);
+        } else {
+            hide_package_manager_button();
+        }
+
+        function show_package_manager_button(project) {
+
+            var configue_button = $('#configure-project-button');
+            configue_button.unbind();
+            configue_button.on('click', function () {
+                require(['nbextensions/packagemanagerextension/extension'], function (show_button) {
+                    show_button(project);
+                }, function (err) {
+                    console.log('Failure while loading packagemanager lib');
+                });
+            });
+
+            configue_button.show();
+        }
+
+        function hide_package_manager_button() {
+            $('#configure-project-button').hide();
+        }
+
     };
 
     /**
