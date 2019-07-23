@@ -81,9 +81,8 @@ define([
     };
 
     child_contents.prototype.create_project_env = function(path) {
-        console.log(path);
         var payload = {
-            "project": path
+            "project": 'SWAN_projects/' + path
         }
         var settings = {
             type: "POST",
