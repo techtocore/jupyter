@@ -100,5 +100,25 @@ define([
         );
     };
 
+    child_contents.prototype.delete_project_env = function(path) {
+        var payload = {
+            "project": 'SWAN_projects/' + path
+        }
+        var settings = {
+            type: "DELETE",
+            processData : false,
+            contentType: 'application/json',
+            dataType : "json",
+            data: JSON.stringify(payload)
+        }
+        var url = this.package_manager_url('projects');
+        return utils.promising_ajax(url, settings).catch(
+            // Translate certain errors to more specific ones.
+            function(error) {
+                throw error;
+            }
+        );
+    };
+
     return {'Contents': child_contents};
 });

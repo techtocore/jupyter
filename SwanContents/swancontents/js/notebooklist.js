@@ -932,23 +932,28 @@ define([
                                 }
                             }
 
-                            that.contents.force_delete(item.path).then(function() {
-                                that.notebook_deleted(item.path);
-                            }).catch(function(e) {
+                            // Delete Associated conda env
 
-                                dialog.modal({
-                                    title: "Delete Failed",
-                                    body: $('<div/>')
-                                        .text("An error occurred while deleting \"" + path + "\".")
-                                        .append($('<div/>')
-                                            .addClass('alert alert-danger')
-                                            .text(e.message || e)),
-                                    buttons: {
-                                        OK: {'class': 'btn-primary'}
-                                    }
+                            that.contents.delete_project_env(item.path).then(function() {
+                                that.contents.force_delete(item.path).then(function() {
+                                    that.notebook_deleted(item.path);
+                                }).catch(function(e) {
+    
+                                    dialog.modal({
+                                        title: "Delete Failed",
+                                        body: $('<div/>')
+                                            .text("An error occurred while deleting \"" + path + "\".")
+                                            .append($('<div/>')
+                                                .addClass('alert alert-danger')
+                                                .text(e.message || e)),
+                                        buttons: {
+                                            OK: {'class': 'btn-primary'}
+                                        }
+                                    });
+                                    console.warn('Error during content deletion:', e);
                                 });
-                                console.warn('Error during content deletion:', e);
                             });
+                            
                         });
                     }
                 }
