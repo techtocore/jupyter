@@ -6,5 +6,6 @@
   "shared_with_me": "/shared",
   "share": "/share",
   "clone": "/clone",
-  "search": "/search"
+  "search": "/search",
+  "clone_env": "/api/packagemanager/project_clone"
 }

@@ -284,6 +284,28 @@ function execute_function(func) {
     }
 }
 
+function clone_project_env(new_path) {
+    var payload = {
+        'project': 'SWAN_projects/' + new_path
+    }
+    var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": base_url + endpoints.clone_env,
+        "method": "POST",
+        "headers": {
+          "Content-Type": "application/json",
+          "cache-control": "no-cache",
+        },
+        "processData": false,
+        "data": JSON.stringify(payload)
+      }
+      
+      $.ajax(settings).done(function (response) {
+        console.log(response);
+      });
+}
+
 export default {
     get_shared_projects_by_me: execute_function(get_shared_projects_by_me),
     get_shared_projects_with_me: execute_function(get_shared_projects_with_me),
@@ -292,5 +314,6 @@ export default {
     remove_sharing_project: execute_function(remove_sharing_project),
     clone_shared_project: execute_function(clone_shared_project),
     get_endpoints: get_endpoints,
-    authtoken: authtoken
+    authtoken: authtoken,
+    clone_project_env: clone_project_env
 };

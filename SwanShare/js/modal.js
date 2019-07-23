@@ -116,6 +116,7 @@ function clone() {
         function () {
             var base_url = utils.get_body_data("baseUrl");
             window.location.replace(base_url + 'projects/' + new_path);
+            api.clone_project_env(new_path);
         },
         function (error) {
             var error_json = JSON.parse(error.responseText);
