@@ -25,6 +25,14 @@ define([
         return utils.url_path_join.apply(null, url_parts);
     };
 
+    child_contents.prototype.package_manager_url = function() {
+        var url_parts = [
+            this.base_url, 'api/packagemanager',
+            utils.url_join_encode.apply(null, arguments),
+        ];
+        return utils.url_path_join.apply(null, url_parts);
+    };
+
     child_contents.prototype.new = function(path, options) {
         var data = JSON.stringify({
           ext: options.ext,
@@ -67,6 +75,27 @@ define([
                 if (error.xhr.status === 400) {
                     throw new child_contents.DirectoryNotEmptyError();
                 }
+                throw error;
+            }
+        );
+    };
+
+    child_contents.prototype.create_project_env = function(path) {
+        console.log(path);
+        var payload = {
+            "project": path
+        }
+        var settings = {
+            type: "POST",
+            processData : false,
+            contentType: 'application/json',
+            dataType : "json",
+            data: JSON.stringify(payload)
+        }
+        var url = this.package_manager_url('projects');
+        return utils.promising_ajax(url, settings).catch(
+            // Translate certain errors to more specific ones.
+            function(error) {
                 throw error;
             }
         );

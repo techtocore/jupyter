@@ -533,6 +533,24 @@ define([
                     path: path
                 }, path, url);
                 that.update_swan_location(path);
+                
+                that.contents.create_project_env(path).then(function() {
+                    console.log('Project env Created');
+                }).catch(function(e) {
+
+                    dialog.modal({
+                        title: "Project Creation Failed",
+                        body: $('<div/>')
+                            .text("An error occurred while creating an env for \"" + path + "\".")
+                            .append($('<div/>')
+                                .addClass('alert alert-danger')
+                                .text(e.message || e)),
+                        buttons: {
+                            OK: {'class': 'btn-primary'}
+                        }
+                    });
+                    console.warn('Error during project creation:', e);
+                });
             }
 
             function new_project_error(modal, message, exception) {
