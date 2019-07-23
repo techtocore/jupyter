@@ -102,7 +102,7 @@ define([
 
     child_contents.prototype.delete_project_env = function(path) {
         var payload = {
-            "project": 'SWAN_projects/' + path
+            "project": path
         }
         var settings = {
             type: "DELETE",
