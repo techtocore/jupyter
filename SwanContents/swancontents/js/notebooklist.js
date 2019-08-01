@@ -254,7 +254,7 @@ define([
             var configue_button = $('#configure-project-button');
             configue_button.unbind();
             configue_button.on('click', function () {
-                require(['nbextensions/packagemanagerextension/extension'], function (configure) {
+                require(['nbextensions/packagemanager/extension'], function (configure) {
                     configure.show_button(project);
                 }, function (err) {
                     console.log('Failure while loading packagemanager lib');
