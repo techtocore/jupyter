@@ -268,6 +268,18 @@ define([
             $('#configure-project-button').hide();
         }
 
+        /*
+        Filter the kernels to display only the one corresponding to the current project
+        */
+
+        $('#new-buttons').on('click', function () {
+            require(['nbextensions/packagemanager/extension'], function (configure) {
+                configure.filter_kernel(list.project);
+            }, function (err) {
+                console.log('Failure while loading packagemanager lib');
+            });
+        });
+
     };
 
     /**
