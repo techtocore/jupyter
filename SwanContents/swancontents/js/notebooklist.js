@@ -243,8 +243,10 @@ define([
 
         if (list.type === 'project') {
             show_package_manager_button(list.path);
+            filter_kernel_list(list.path);
         } else if (list.type === 'directory' && list.project) {
             show_package_manager_button(list.project);
+            filter_kernel_list(list.project);
         } else {
             hide_package_manager_button();
         }
@@ -272,13 +274,17 @@ define([
         Filter the kernels to display only the one corresponding to the current project
         */
 
-        $('#new-buttons').on('click', function () {
-            require(['nbextensions/packagemanager/extension'], function (configure) {
-                configure.filter_kernel(list.project);
-            }, function (err) {
-                console.log('Failure while loading packagemanager lib');
+        function filter_kernel_list(project) {
+            var plus_button = $('#new-buttons');
+            plus_button.unbind();
+            plus_button.on('click', function () {
+                require(['nbextensions/packagemanager/extension'], function (configure) {
+                    configure.filter_kernel(project);
+                }, function (err) {
+                    console.log('Failure while loading packagemanager lib');
+                });
             });
-        });
+        }
 
     };
 
