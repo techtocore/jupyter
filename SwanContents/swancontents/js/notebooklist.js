@@ -537,23 +537,25 @@ define([
              */
 
             function new_project_success(modal, path) {
-
-                var url = utils.url_path_join(
-                    that.base_url,
-                    that.current_page.path,
-                    utils.encode_uri_components(path)
-                );
-
-                modal.data('bs.modal').isShown = true;
-                modal.modal('hide');
-
-                window.history.pushState({
-                    path: path
-                }, path, url);
-                that.update_swan_location(path);
                 
                 that.contents.create_project_env(path).then(function() {
+
                     console.log('Project env Created');
+
+                    var url = utils.url_path_join(
+                        that.base_url,
+                        that.current_page.path,
+                        utils.encode_uri_components(path)
+                    );
+    
+                    modal.data('bs.modal').isShown = true;
+                    modal.modal('hide');
+    
+                    window.history.pushState({
+                        path: path
+                    }, path, url);
+                    that.update_swan_location(path);
+
                 }).catch(function(e) {
 
                     dialog.modal({
@@ -927,6 +929,21 @@ define([
         }
         var that = this;
 
+        function show_error(e) {    
+            dialog.modal({
+                title: "Delete Failed",
+                body: $('<div/>')
+                    .text("An error occurred while deleting \"" + path + "\".")
+                    .append($('<div/>')
+                        .addClass('alert alert-danger')
+                        .text(e.message || e)),
+                buttons: {
+                    OK: {'class': 'btn-primary'}
+                }
+            });
+            console.warn('Error during content deletion:', e);
+        }
+
         dialog.modal({
             title : "Delete",
             body : $(message),
@@ -950,27 +967,24 @@ define([
                                 }
                             }
 
-                            // Delete Associated conda env
+                            // Delete Associated conda env only if the selected item is a project
 
-                            that.contents.delete_project_env(item.path).then(function() {
+                            if (item.type === "project") {
+                                that.contents.delete_project_env(item.path).then(function() {
+                                    that.contents.force_delete(item.path).then(function() {
+                                        that.notebook_deleted(item.path);
+                                    });
+                                }).catch(function(e) {
+                                    show_error(e);
+                                });
+                            }
+                            else {
                                 that.contents.force_delete(item.path).then(function() {
                                     that.notebook_deleted(item.path);
                                 }).catch(function(e) {
-    
-                                    dialog.modal({
-                                        title: "Delete Failed",
-                                        body: $('<div/>')
-                                            .text("An error occurred while deleting \"" + path + "\".")
-                                            .append($('<div/>')
-                                                .addClass('alert alert-danger')
-                                                .text(e.message || e)),
-                                        buttons: {
-                                            OK: {'class': 'btn-primary'}
-                                        }
-                                    });
-                                    console.warn('Error during content deletion:', e);
+                                    show_error(e);
                                 });
-                            });
+                            }
                             
                         });
                     }
