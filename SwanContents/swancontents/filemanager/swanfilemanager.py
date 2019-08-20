@@ -11,7 +11,7 @@ import os, io, stat, shutil, subprocess, tempfile, requests
 from notebook.utils import (
     is_hidden, is_file_hidden
 )
-
+import yaml
 
 class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
     """ SWAN File Manager Wrapper
@@ -159,6 +159,16 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
         else:
             self.log.debug("Directory %r already exists", os_path)
 
+    def _override_kernel(self, content, path):
+        os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
+        env = yaml.load(open(os_path_proj))['ENV']
+        kernelspec = {}
+        kernelspec["display_name"] = "Python [conda env:" + env + "]"
+        kernelspec["language"] =  "python"
+        kernelspec["name"] =  "conda-env-" + env + "-py"
+        content.metadata.kernelspec = kernelspec
+        return content
+
     def get(self, path, content=True, type=None, format=None):
         """ Get info from a path"""
 
@@ -210,7 +220,10 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
 
             else:
                 if model['type'] == 'notebook':
-                    nb = nbformat.from_dict(model['content'])
+                    nb_content = model['content']                    
+                    # custom kernel spec
+                    nb_content = self._override_kernel(nb_content, path)
+                    nb = nbformat.from_dict(nb_content)
                     self.check_and_sign(nb, path)
                     self._save_notebook(os_path, nb)
                     # One checkpoint should always exist for notebooks.

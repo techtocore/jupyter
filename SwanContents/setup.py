@@ -11,6 +11,7 @@ setup(name='swancontents',
       install_requires=[
           'notebook==5.7.*',
           'tornado',
-          'jupyter_core'
+          'jupyter_core',
+          'pyyaml'
       ],
   )
