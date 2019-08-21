@@ -174,11 +174,12 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
             # env = yaml.load(open(os_path_proj))['ENV']
             swanfile = swanproject.SwanProject(os_path_proj)
             env = swanfile.env
-            kernelspec = {}
-            kernelspec["display_name"] = "Python [conda env:" + env + "]"
-            kernelspec["language"] =  "python"
-            kernelspec["name"] =  "conda-env-" + env + "-py"
-            content["metadata"]["kernelspec"] = kernelspec
+            if 'swanproject-' in env:
+                kernelspec = {}
+                kernelspec["display_name"] = "Python [conda env:" + env + "]"
+                kernelspec["language"] =  "python"
+                kernelspec["name"] =  "conda-env-" + env + "-py"
+                content["metadata"]["kernelspec"] = kernelspec
         except:
             pass
         return content
