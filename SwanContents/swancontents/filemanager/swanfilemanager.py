@@ -13,6 +13,14 @@ from notebook.utils import (
 )
 import yaml
 
+has_package_manager = False
+
+try:
+    from packagemanager import swanproject
+    has_package_manager = True
+except:
+    pass
+
 class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
     """ SWAN File Manager Wrapper
         Adds "Project" as a new type of folder
@@ -160,14 +168,19 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
             self.log.debug("Directory %r already exists", os_path)
 
     def _override_kernel(self, content, path):
-        path = path.rsplit('/', 1)[0]
-        os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
-        env = yaml.load(open(os_path_proj))['ENV']
-        kernelspec = {}
-        kernelspec["display_name"] = "Python [conda env:" + env + "]"
-        kernelspec["language"] =  "python"
-        kernelspec["name"] =  "conda-env-" + env + "-py"
-        content["metadata"]["kernelspec"] = kernelspec
+        try:
+            path = path.rsplit('/', 1)[0]
+            os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
+            # env = yaml.load(open(os_path_proj))['ENV']
+            swanfile = swanproject.SwanProject(os_path_proj)
+            env = swanfile.env
+            kernelspec = {}
+            kernelspec["display_name"] = "Python [conda env:" + env + "]"
+            kernelspec["language"] =  "python"
+            kernelspec["name"] =  "conda-env-" + env + "-py"
+            content["metadata"]["kernelspec"] = kernelspec
+        except:
+            pass
         return content
 
     def get(self, path, content=True, type=None, format=None):
@@ -223,7 +236,8 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
                 if model['type'] == 'notebook':
                     nb_content = model['content']                    
                     # custom kernel spec
-                    nb_content = self._override_kernel(nb_content, path)
+                    if has_package_manager == True:
+                        nb_content = self._override_kernel(nb_content, path)
                     nb = nbformat.from_dict(nb_content)
                     self.check_and_sign(nb, path)
                     self._save_notebook(os_path, nb)
