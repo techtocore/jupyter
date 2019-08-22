@@ -183,6 +183,13 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
         except:
             pass
         return content
+    
+    def _remove_kernel(self, content, path):
+        try:
+            content["metadata"]["kernelspec"] = {}
+        except:
+            pass
+        return content
 
     def get(self, path, content=True, type=None, format=None):
         """ Get info from a path"""
@@ -208,6 +215,14 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
 
         else:
             model = super(LargeFileManager, self).get(path, content)
+        
+        try:
+            if model.get('cells', 0):
+                if has_package_manager == True:
+                    model = self._override_kernel(model, path)
+        except:
+            pass
+
         return model
 
     def save(self, model, path=''):
@@ -238,7 +253,7 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
                     nb_content = model['content']                    
                     # custom kernel spec
                     if has_package_manager == True:
-                        nb_content = self._override_kernel(nb_content, path)
+                        nb_content = self._remove_kernel(nb_content, path)
                     nb = nbformat.from_dict(nb_content)
                     self.check_and_sign(nb, path)
                     self._save_notebook(os_path, nb)
