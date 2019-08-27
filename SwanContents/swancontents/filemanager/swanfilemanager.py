@@ -168,27 +168,21 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
             self.log.debug("Directory %r already exists", os_path)
 
     def _override_kernel(self, content, path):
-        try:
-            path = path.rsplit('/', 1)[0]
-            os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
-            # env = yaml.load(open(os_path_proj))['ENV']
-            swanfile = swanproject.SwanProject(os_path_proj)
-            env = swanfile.env
-            if 'swanproject-' in env:
-                kernelspec = {}
-                kernelspec["display_name"] = "Python [conda env:" + env + "]"
-                kernelspec["language"] =  "python"
-                kernelspec["name"] =  "conda-env-" + env + "-py"
-                content["metadata"]["kernelspec"] = kernelspec
-        except:
-            pass
+        path = path.rsplit('/', 1)[0]
+        os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
+        # env = yaml.load(open(os_path_proj))['ENV']
+        swanfile = swanproject.SwanProject(os_path_proj)
+        env = swanfile.env
+        if 'swanproject-' in env:
+            kernelspec = {}
+            kernelspec["display_name"] = "Python [conda env:" + env + "]"
+            kernelspec["language"] =  "python"
+            kernelspec["name"] =  "conda-env-" + env + "-py"
+            content["metadata"]["kernelspec"] = kernelspec
         return content
     
     def _remove_kernel(self, content, path):
-        try:
-            content['metadata'].pop('kernelspec', None)
-        except:
-            pass
+        content['metadata'].pop('kernelspec', None)
         return content
 
     def get(self, path, content=True, type=None, format=None):
@@ -251,9 +245,6 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
             else:
                 if model['type'] == 'notebook':
                     nb_content = model['content']                    
-                    # custom kernel spec
-                    if has_package_manager == True:
-                        nb_content = self._remove_kernel(nb_content, path)
                     nb = nbformat.from_dict(nb_content)
                     self.check_and_sign(nb, path)
                     self._save_notebook(os_path, nb)
@@ -310,10 +301,6 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
                 and model['type'] != 'project':
             if model['type'] == 'notebook':
                 model['content'] = new_notebook()
-                nb_content = model['content']                    
-                # custom kernel spec
-                if has_package_manager == True:
-                    nb_content = self._remove_kernel(nb_content, path)
                 model['format'] = 'json'
             else:
                 model['content'] = ''
@@ -354,10 +341,6 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
 
         elif model['type'] == 'notebook':
             untitled = self.untitled_notebook
-            nb_content = model['content']                    
-            # custom kernel spec
-            if has_package_manager == True:
-                nb_content = self._remove_kernel(nb_content, path)
             ext = '.ipynb'
 
         elif model['type'] == 'file':
