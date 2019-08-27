@@ -209,13 +209,6 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
 
         else:
             model = super(LargeFileManager, self).get(path, content)
-        
-        try:
-            if model.get('nbformat', 0):
-                if has_package_manager == True:
-                    model = self._override_kernel(model, path)
-        except:
-            pass
 
         return model
 
@@ -244,7 +237,9 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
 
             else:
                 if model['type'] == 'notebook':
-                    nb_content = model['content']                    
+                    nb_content = model['content']
+                    if has_package_manager == True:
+                        nb_content = self._override_kernel(nb_content, path)
                     nb = nbformat.from_dict(nb_content)
                     self.check_and_sign(nb, path)
                     self._save_notebook(os_path, nb)
