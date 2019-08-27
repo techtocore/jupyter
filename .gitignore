@@ -7,3 +7,4 @@ SparkMonitor/scalalistener/target/
 SparkMonitor/sparkmonitor/listener.jar
 .idea/
 __pycache__
+PackageManager/packagemanagerextension.egg-info/
