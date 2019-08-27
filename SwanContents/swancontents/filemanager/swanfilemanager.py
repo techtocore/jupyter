@@ -186,7 +186,7 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
     
     def _remove_kernel(self, content, path):
         try:
-            content["metadata"]["kernelspec"] = {}
+            content['metadata'].pop('kernelspec', None)
         except:
             pass
         return content
