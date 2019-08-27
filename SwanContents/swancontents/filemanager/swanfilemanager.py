@@ -238,8 +238,8 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
             else:
                 if model['type'] == 'notebook':
                     nb_content = model['content']
-                    if has_package_manager == True:
-                        nb_content = self._override_kernel(nb_content, path)
+                    # if has_package_manager == True:
+                    #     nb_content = self._override_kernel(nb_content, path)
                     nb = nbformat.from_dict(nb_content)
                     self.check_and_sign(nb, path)
                     self._save_notebook(os_path, nb)

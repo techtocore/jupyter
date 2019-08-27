@@ -3,6 +3,15 @@ from notebook.utils import url_path_join
 from tornado.web import HTTPError
 from contextlib import contextmanager
 import io, os, nbformat
+import json, yaml
+
+has_package_manager = False
+
+try:
+    from packagemanager import swanproject
+    has_package_manager = True
+except:
+    pass
 
 swan_sharing_folder = 'swan_sharing_folder/'
 
@@ -91,8 +100,28 @@ class SwanFileManagerMixin(FileManagerMixin):
         else:
             return super()._get_os_path(path)
 
+    
+    def _override_kernel(self, content, path):
+        path = path.rsplit('/', 1)[0]
+        os_path_proj = path + '/.swanproject'
+        env = yaml.load(open(os_path_proj))['ENV']
+        kernelspec = {}
+        kernelspec["display_name"] = "Python [conda env:" + env + "]"
+        kernelspec["language"] =  "python"
+        kernelspec["name"] =  "conda-env-" + env + "-py"
+        content["metadata"]["kernelspec"] = kernelspec
+        return content
+
+    def _replace_kernelspec(self, path):
+        content = json.load(open(path,'r'))
+        content = self._override_kernel(content, path)
+        json.dump(content, open(path, 'w'))
+
+
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
+        if has_package_manager == True:
+            self._replace_kernelspec(os_path)
         with self.open(os_path, 'r', encoding='utf-8') as f:
             try:
                 return nbformat.read(f, as_version=as_version)
