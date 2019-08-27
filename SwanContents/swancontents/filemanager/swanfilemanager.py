@@ -217,7 +217,7 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
             model = super(LargeFileManager, self).get(path, content)
         
         try:
-            if model.get('cells', 0):
+            if model.get('nbformat', 0):
                 if has_package_manager == True:
                     model = self._override_kernel(model, path)
         except:
@@ -310,6 +310,10 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
                 and model['type'] != 'project':
             if model['type'] == 'notebook':
                 model['content'] = new_notebook()
+                nb_content = model['content']                    
+                # custom kernel spec
+                if has_package_manager == True:
+                    nb_content = self._remove_kernel(nb_content, path)
                 model['format'] = 'json'
             else:
                 model['content'] = ''
@@ -350,6 +354,10 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
 
         elif model['type'] == 'notebook':
             untitled = self.untitled_notebook
+            nb_content = model['content']                    
+            # custom kernel spec
+            if has_package_manager == True:
+                nb_content = self._remove_kernel(nb_content, path)
             ext = '.ipynb'
 
         elif model['type'] == 'file':
