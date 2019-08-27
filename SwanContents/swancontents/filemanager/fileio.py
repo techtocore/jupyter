@@ -101,20 +101,22 @@ class SwanFileManagerMixin(FileManagerMixin):
             return super()._get_os_path(path)
 
     
-    def _override_kernel(self, content, path):
+    def _override_env(self, content, path):
         path = path.rsplit('/', 1)[0]
         os_path_proj = path + '/.swanproject'
-        env = yaml.load(open(os_path_proj))['ENV']
-        kernelspec = {}
-        kernelspec["display_name"] = "Python [conda env:" + env + "]"
-        kernelspec["language"] =  "python"
-        kernelspec["name"] =  "conda-env-" + env + "-py"
-        content["metadata"]["kernelspec"] = kernelspec
+        swanfile = swanproject.SwanProject(os_path_proj)
+        env = swanfile.env
+        if 'swanproject-' in env:
+            kernelspec = {}
+            kernelspec["display_name"] = "Python [conda env:" + env + "]"
+            kernelspec["language"] =  "python"
+            kernelspec["name"] =  "conda-env-" + env + "-py"
+            content["metadata"]["kernelspec"] = kernelspec
         return content
 
     def _replace_kernelspec(self, path):
         content = json.load(open(path,'r'))
-        content = self._override_kernel(content, path)
+        content = self._override_env(content, path)
         json.dump(content, open(path, 'w'))
 
 

@@ -167,23 +167,23 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
         else:
             self.log.debug("Directory %r already exists", os_path)
 
-    def _override_kernel(self, content, path):
-        path = path.rsplit('/', 1)[0]
-        os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
-        # env = yaml.load(open(os_path_proj))['ENV']
-        swanfile = swanproject.SwanProject(os_path_proj)
-        env = swanfile.env
-        if 'swanproject-' in env:
-            kernelspec = {}
-            kernelspec["display_name"] = "Python [conda env:" + env + "]"
-            kernelspec["language"] =  "python"
-            kernelspec["name"] =  "conda-env-" + env + "-py"
-            content["metadata"]["kernelspec"] = kernelspec
-        return content
+    # def _override_kernel(self, content, path):
+    #     path = path.rsplit('/', 1)[0]
+    #     os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
+    #     # env = yaml.load(open(os_path_proj))['ENV']
+    #     swanfile = swanproject.SwanProject(os_path_proj)
+    #     env = swanfile.env
+    #     if 'swanproject-' in env:
+    #         kernelspec = {}
+    #         kernelspec["display_name"] = "Python [conda env:" + env + "]"
+    #         kernelspec["language"] =  "python"
+    #         kernelspec["name"] =  "conda-env-" + env + "-py"
+    #         content["metadata"]["kernelspec"] = kernelspec
+    #     return content
     
-    def _remove_kernel(self, content, path):
-        content['metadata'].pop('kernelspec', None)
-        return content
+    # def _remove_kernel(self, content, path):
+    #     content['metadata'].pop('kernelspec', None)
+    #     return content
 
     def get(self, path, content=True, type=None, format=None):
         """ Get info from a path"""
