@@ -170,16 +170,20 @@ class SwanFileManager(SwanFileManagerMixin, LargeFileManager):
     def _override_kernel(self, content, path):
         path = path.rsplit('/', 1)[0]
         # os_path_proj = self._get_os_path(path + '/' + self.swan_default_file)
-        # env = yaml.load(open(os_path_proj))['ENV']
         os_path_proj = path + '/' + self.swan_default_file
-        swanfile = swanproject.SwanProject(os_path_proj)
-        env = swanfile.env
-        if 'swanproject-' in env:
-            kernelspec = {}
-            kernelspec["display_name"] = "Python [conda env:" + env + "]"
-            kernelspec["language"] =  "python"
-            kernelspec["name"] =  "conda-env-" + env + "-py"
-            content["metadata"]["kernelspec"] = kernelspec
+        # swanfile = swanproject.SwanProject(os_path_proj)
+        # env = swanfile.env
+        try:
+            env = yaml.load(open(os_path_proj))['ENV']
+            if 'swanproject-' in env:
+                self.log.info(content)
+                kernelspec = {}
+                kernelspec["display_name"] = "Python [conda env:" + env + "]"
+                kernelspec["language"] =  "python"
+                kernelspec["name"] =  "conda-env-" + env + "-py"
+                content["metadata"]["kernelspec"] = kernelspec
+        except:
+            pass
         return content
     
     # def _remove_kernel(self, content, path):
