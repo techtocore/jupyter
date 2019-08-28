@@ -3,7 +3,7 @@ from notebook.utils import url_path_join
 from tornado.web import HTTPError
 from contextlib import contextmanager
 import io, os, nbformat
-import json, yaml
+import json, yaml, sys
 
 has_package_manager = False
 
@@ -103,15 +103,18 @@ class SwanFileManagerMixin(FileManagerMixin):
     
     def _override_env(self, content, path):
         path = path.rsplit('/', 1)[0]
-        os_path_proj = path + '/.swanproject'
-        swanfile = swanproject.SwanProject(os_path_proj)
-        env = swanfile.env
-        if 'swanproject-' in env:
-            kernelspec = {}
-            kernelspec["display_name"] = "Python [conda env:" + env + "]"
-            kernelspec["language"] =  "python"
-            kernelspec["name"] =  "conda-env-" + env + "-py"
-            content["metadata"]["kernelspec"] = kernelspec
+        try:
+            os_path_proj = path + '/.swanproject'
+            swanfile = swanproject.SwanProject(os_path_proj)
+            env = swanfile.env
+            if 'swanproject-' in env:
+                kernelspec = {}
+                kernelspec["display_name"] = "Python [conda env:" + env + "]"
+                kernelspec["language"] =  "python"
+                kernelspec["name"] =  "conda-env-" + env + "-py"
+                content["metadata"]["kernelspec"] = kernelspec
+        except:
+            pass
         return content
 
     def _replace_kernelspec(self, path):
@@ -122,8 +125,8 @@ class SwanFileManagerMixin(FileManagerMixin):
 
     def _read_notebook(self, os_path, as_version=4):
         """Read a notebook from an os path."""
-        if has_package_manager == True:
-            self._replace_kernelspec(os_path)
+        # if has_package_manager == True:
+        #     self._replace_kernelspec(os_path)
         with self.open(os_path, 'r', encoding='utf-8') as f:
             try:
                 return nbformat.read(f, as_version=as_version)
