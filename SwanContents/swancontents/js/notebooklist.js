@@ -558,6 +558,8 @@ define([
                     }, path, url);
                     that.update_swan_location(path);
 
+                    window.location.reload();
+
                 }).catch(function(e) {
 
                     dialog.modal({
