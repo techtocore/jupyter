@@ -392,8 +392,8 @@ define([
 
                 var modal = dialog.modal({
                     title: 'New Project',
-                    body: $('<p class="rename-message">Enter a project name:</p><br>\
-                            <input type="text" name="proj_name" placeholder="Keep empty for default name..." class="form-control">'),
+                    body: $('<div id="new_project_modal"><p class="rename-message">Enter a project name:</p><br>\
+                            <input type="text" name="proj_name" placeholder="Keep empty for default name..." class="form-control"></div>'),
                     buttons: {
                         'Create': {
                             class: 'btn-primary size-100',
@@ -413,6 +413,8 @@ define([
                 modal.find(".modal-header").unbind("mousedown");
 
                 function create_new_project() {
+
+                    $('#new_project_modal').html('<h2> The project is being setup </h2>');
 
                     modal.find('.btn').prop('disabled', true);
                     modal.data('bs.modal').isShown = false;
