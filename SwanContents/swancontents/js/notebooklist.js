@@ -414,12 +414,12 @@ define([
 
                 function create_new_project() {
 
-                    $('#new_project_modal').html('<h2> The project is being setup </h2>');
-
                     modal.find('.btn').prop('disabled', true);
                     modal.data('bs.modal').isShown = false;
 
                     var proj_name = modal.find('input[name="proj_name"]').val();
+
+                    $('#new_project_modal').html('<h2> The project is being setup </h2>');
 
                     if (proj_name === '') {
                         that.contents.new_untitled((that.notebook_path || ''), {type: 'project'})
@@ -948,7 +948,7 @@ define([
 
         dialog.modal({
             title : "Delete",
-            body : $(message),
+            body : $('<div id="project_delete_modal">' + message + '</div>'),
             default_button: "Cancel",
             buttons : {
                 Cancel: {},
@@ -958,6 +958,8 @@ define([
                         // Shutdown any/all selected notebooks before deleting
                         // the files.
                         that.shutdown_selected();
+
+                        var len = selected.length;
 
                         // Delete selected.
                         selected.forEach(function(item) {
@@ -972,6 +974,11 @@ define([
                             // Delete Associated conda env only if the selected item is a project
 
                             if (item.type === "project") {
+                                if(len === 1)
+                                    $('#project_delete_modal').html('<h2> The project is being deleted </h2>');
+                                else
+                                    $('#project_delete_modal').html('<h2> The projects are being deleted </h2>');
+
                                 that.contents.delete_project_env(item.path).then(function() {
                                     that.contents.force_delete(item.path).then(function() {
                                         that.notebook_deleted(item.path);
